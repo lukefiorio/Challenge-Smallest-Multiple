@@ -6,14 +6,8 @@
  * @return { Number }         Lowest Positive Number that is evenly divisible by all numbers
  *                            between 1 and `ceiling`
  */
-module.exports = function (ceiling) {
+module.exports = function (n) {
   // do work here
-
-
-  return 0;
-};
-
-function getLCM3(n) {
   // step1: get array of primes (<=n) & make corresponding array to start holding "max" exponent values associated with each prime
   let isPrime = [2];
   let expArr = [1];
@@ -23,8 +17,8 @@ function getLCM3(n) {
       if (i % isPrime[j] === 0) newPrime = 0;
     }
     if (newPrime === 1) {
-    isPrime.push(i);
-    expArr.push(1);
+      isPrime.push(i);
+      expArr.push(1);
     }
   }
 
@@ -37,8 +31,8 @@ function getLCM3(n) {
       let expCnt = 0;
       while ((arrDiv[k - 1] % isPrime[m] === 0) && (k !== isPrime[m])) {
         if ((k % isPrime[m] === 0) && (k !== isPrime[m])) {
-           arrDiv[k - 1] /= isPrime[m];
-           expCnt ++;
+          arrDiv[k - 1] /= isPrime[m];
+          expCnt++;
         }
       }
       if (expCnt > expArr[m]) expArr[m] = expCnt;
@@ -47,11 +41,9 @@ function getLCM3(n) {
 
   // step3: loop thru each prime number, applying exponent & then multiplying to subsequent (prime^exp)
   let lcmResult = 1;
-  for (let j=0; j<isPrime.length; j++) {
+  for (let j = 0; j < isPrime.length; j++) {
     lcmResult *= isPrime[j] ** expArr[j];
   }
 
   return lcmResult;
-}
-
-console.log(getLCM3(20));
+};
