@@ -6,43 +6,80 @@
  * @return { Number }         Lowest Positive Number that is evenly divisible by all numbers
  *                            between 1 and `ceiling`
  */
-module.exports = function (n) {
+module.exports = function(ceiling) {
   // do work here
-  // step1: get array of primes (<=n) & make corresponding array to start holding "max" exponent values associated with each prime
-  let isPrime = [2];
-  let expArr = [1];
-  for (let i = 3; i <= n; i++) {
-    let newPrime = 1;
-    for (let j = 0; (j < isPrime.length) && (newPrime === 1); j++) {
-      if (i % isPrime[j] === 0) newPrime = 0;
+  // step1: make array of prime objects up to [ceiling]. Store value & facorization of each prime.
+
+  let primeFactorList = [
+    {
+      prime: 2,
+      exponent: 1
     }
-    if (newPrime === 1) {
-      isPrime.push(i);
-      expArr.push(1);
+  ];
+
+  for (let index = 3; index <= ceiling; index++) {
+    let newPrime = true;
+
+    for (
+      let primeFactorListIndex = 0;
+      primeFactorListIndex < primeFactorList.length && newPrime;
+      primeFactorListIndex++
+    ) {
+      let currentFactorialObj = primeFactorList[primeFactorListIndex];
+      if (index % currentFactorialObj.prime === 0) {
+        newPrime = false;
+      }
+    }
+
+    if (newPrime) {
+      const primeFactor = {
+        prime: index,
+        exponent: 1
+      };
+
+      primeFactorList.push(primeFactor);
     }
   }
 
-  // step2: loop 1 to n, counting how many divisions of given factor it takes to reduce non-primes to 1
-  // store that info in the expArr we started above
-  let arrDiv = [];
-  for (let k = 1; k <= n; k++) {
-    arrDiv.push(k);
-    for (let m = 0; m < isPrime.length; m++) {
-      let expCnt = 0;
-      while ((arrDiv[k - 1] % isPrime[m] === 0) && (k !== isPrime[m])) {
-        if ((k % isPrime[m] === 0) && (k !== isPrime[m])) {
-          arrDiv[k - 1] /= isPrime[m];
-          expCnt++;
+  // step2: loop 1 to n, counting how many divisions by given prime it takes to reduce non-primes to 1
+  for (let curIndex = 1; curIndex <= ceiling; curIndex++) {
+    let numberToFactor = curIndex;
+    for (
+      let curPrimeFactorIndex = 0;
+      curPrimeFactorIndex < primeFactorList.length;
+      curPrimeFactorIndex++
+    ) {
+      let curPrimeObj = primeFactorList[curPrimeFactorIndex];
+      let exponentCnt = 1;
+      while (
+        numberToFactor % curPrimeObj.prime === 0 &&
+        numberToFactor !== curPrimeObj.prime
+      ) {
+        if (
+          numberToFactor % curPrimeObj.prime === 0 &&
+          numberToFactor !== curPrimeObj.prime
+        ) {
+          numberToFactor /= curPrimeObj.prime;
+          exponentCnt++;
         }
       }
-      if (expCnt > expArr[m]) expArr[m] = expCnt;
+      // store exponent value of prime factorization if higher than existing exponent
+      if (exponentCnt > primeFactorList[curPrimeFactorIndex].exponent) {
+        primeFactorList[curPrimeFactorIndex].exponent = exponentCnt;
+      }
     }
   }
 
-  // step3: loop thru each prime number, applying exponent & then multiplying to subsequent (prime^exp)
+  // step3: loop thru array of prime objects, applying 'Product-exponent' (multiply each (prime^exp))
   let lcmResult = 1;
-  for (let j = 0; j < isPrime.length; j++) {
-    lcmResult *= isPrime[j] ** expArr[j];
+  for (
+    let PrimeFactorIndex = 0;
+    PrimeFactorIndex < primeFactorList.length;
+    PrimeFactorIndex++
+  ) {
+    lcmResult *=
+      primeFactorList[PrimeFactorIndex].prime **
+      primeFactorList[PrimeFactorIndex].exponent;
   }
 
   return lcmResult;
